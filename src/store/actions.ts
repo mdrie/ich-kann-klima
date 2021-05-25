@@ -1,15 +1,17 @@
 import { Context } from "."
 import { LawId, GameId, Game, LawReference, Event, AcceptedLaw, LawLabel } from "../types"
 import router from "../router"
-import RepositoryFactory, { createGame } from "../repository"
+import API from "../api"
+import RepositoryFactory from "../repository"
 import * as Calculator from "../Calculator"
 import { fillUpLawProposals, getAcceptedLaw, replaceLawProposal } from "../LawProposer"
 
-const repository = RepositoryFactory()
+const backendURL = localStorage.getItem("backendURL") || "https://api.ich-kann-klima.de/api"
+const repository = RepositoryFactory(API(backendURL, fetch))
 
 export const actions = {
-  startGame(context: Context) {
-    const game = createGame()
+  async startGame(context: Context) {
+    const game = await repository.createGame()
     game.acceptedLaws = context.state.allLaws
       .filter((law) => law.labels?.includes("initial"))
       .map<LawReference>((law) => {
@@ -23,8 +25,8 @@ export const actions = {
     router.push("/games/" + game.id)
   },
 
-  loadGame(context: Context, payload: { gameId: GameId }) {
-    const game = repository.loadGame(payload.gameId)
+  async loadGame(context: Context, payload: { gameId: GameId }) {
+    const game = await repository.loadGame(payload.gameId)
     repository.saveGame(game)
     context.commit("gameLoaded", { game })
   },
