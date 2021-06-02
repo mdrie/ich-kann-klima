@@ -4,8 +4,15 @@ import CurrentIndicators from "../components/CurrentIndicators.vue"
 import EventOccurred from "../components/EventOccurred.vue"
 import PeekInside from "./PeekInside.vue"
 
+const devMode = (import.meta.env.MODE === "development");
+
+var PeekHook = defineComponent({
+  components: (devMode ? {PeekInside} : {}),
+  template: (devMode ? /*html*/`<PeekInside/>` : ``)
+})
+
 export default defineComponent({
-  components: { CurrentIndicators, EventOccurred, PeekInside },
+  components: { CurrentIndicators, EventOccurred, PeekHook },
 })
 </script>
 
@@ -21,7 +28,7 @@ export default defineComponent({
     </div>
   </div>
   <div class="peek">
-    <PeekInside/>
+    <PeekHook/>
   </div>
 
   <EventOccurred />
